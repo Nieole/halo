@@ -2,12 +2,12 @@ package cc.ryanc.halo.web.controller.front;
 
 import cc.ryanc.halo.model.domain.Post;
 import cc.ryanc.halo.model.enums.BlogPropertiesEnum;
+import cc.ryanc.halo.model.enums.PostTypeEnum;
 import cc.ryanc.halo.service.PostService;
 import cc.ryanc.halo.web.controller.core.BaseController;
 import cn.hutool.core.util.PageUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +18,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import static cc.ryanc.halo.model.dto.HaloConst.OPTIONS;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -35,7 +41,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @RequestMapping(value = {"/", "index"})
 public class FrontIndexController extends BaseController {
 
-    @Autowired
+    @Resource
     private PostService postService;
 
 
@@ -77,5 +83,24 @@ public class FrontIndexController extends BaseController {
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         return this.render("index");
+    }
+
+    @GetMapping(value = "/pages")
+    @ResponseBody
+    public Object getPages(HttpServletResponse httpServletResponse) {
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.setHeader("Access-Control-Allow-Headers", "X-Requested-With,xtoken");
+        httpServletResponse.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
+        httpServletResponse.setHeader("X-Powered-By","3.2.1");
+        httpServletResponse.setHeader("Content-Type", "application/json;charset=utf-8");
+        return postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc()).stream().map(e -> new HashMap<String, Object>() {{
+            put("content", e.getPostContent());
+            put("postDate", e.getPostDate());
+            put("title", e.getPostTitle());
+            put("postThumbnail", e.getPostThumbnail());
+            put("tags", e.getTags());
+            put("postUpdate", e.getPostUpdate());
+            put("postType",e.getPostType());
+        }}).collect(Collectors.toList());
     }
 }
