@@ -4,15 +4,15 @@
 [submodule "src/main/resources/templates/themes/hux-halo"]
 	path = src/main/resources/templates/themes/hux-halo
 	url = https://github.com/halo-dev/hux-halo.git
-[submodule "src\\main\\resources\\templates\\themes\\story-halo"]
-	path = src\\main\\resources\\templates\\themes\\story-halo
+[submodule "src/main/resources/templates/themes/story-halo"]
+	path = src/main/resources/templates/themes/story-halo
 	url = https://github.com/halo-dev/story-halo.git
-[submodule "src\\main\\resources\\templates\\themes\\netx-halo"]
-	path = src\\main\\resources\\templates\\themes\\netx-halo
+[submodule "src/main/resources/templates/themes/netx-halo"]
+	path = src/main/resources/templates/themes/netx-halo
 	url = https://github.com/halo-dev/next-halo.git
-[submodule "src\\main\\resources\\templates\\themes\\casper-halo"]
-	path = src\\main\\resources\\templates\\themes\\casper-halo
+[submodule "src/main/resources/templates/themes/casper-halo"]
+	path = src/main/resources/templates/themes/casper-halo
 	url = https://github.com/halo-dev/casper-halo.git
-[submodule "src\\main\\resources\\templates\\themes\\pinghsu-halo"]
-	path = src\\main\\resources\\templates\\themes\\pinghsu-halo
+[submodule "src/main/resources/templates/themes/pinghsu-halo"]
+	path = src/main/resources/templates/themes/pinghsu-halo
 	url = https://github.com/halo-dev/pinghsu-halo.git
