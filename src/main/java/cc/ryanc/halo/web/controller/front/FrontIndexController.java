@@ -94,7 +94,7 @@ public class FrontIndexController extends BaseController {
         httpServletResponse.setHeader("X-Powered-By","3.2.1");
         httpServletResponse.setHeader("Content-Type", "application/json;charset=utf-8");
         return postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc()).stream().map(e -> new HashMap<String, Object>() {{
-            put("content", e.getPostContent());
+            put("content", e.getPostContent().replaceAll("<img src=\"","<img src=\"http://te.jinzantech.com:8181"));
             put("postDate", e.getPostDate());
             put("title", e.getPostTitle());
             put("postThumbnail", e.getPostThumbnail());
