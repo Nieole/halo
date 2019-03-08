@@ -90,17 +90,21 @@ public class FrontIndexController extends BaseController {
     public Object getPages(HttpServletResponse httpServletResponse) {
         httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
         httpServletResponse.setHeader("Access-Control-Allow-Headers", "X-Requested-With,xtoken");
-        httpServletResponse.setHeader("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
-        httpServletResponse.setHeader("X-Powered-By","3.2.1");
+        httpServletResponse.setHeader("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+        httpServletResponse.setHeader("X-Powered-By", "3.2.1");
         httpServletResponse.setHeader("Content-Type", "application/json;charset=utf-8");
-        return postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc()).stream().map(e -> new HashMap<String, Object>() {{
-            put("content", e.getPostContent().replaceAll("<img src=\"","<img src=\"http://te.jinzantech.com:8181"));
-            put("postDate", e.getPostDate());
-            put("title", e.getPostTitle());
-            put("postThumbnail", e.getPostThumbnail());
-            put("tags", e.getTags());
-            put("postUpdate", e.getPostUpdate());
-            put("postType",e.getPostType());
-        }}).collect(Collectors.toList());
+        return postService.findAll(PostTypeEnum.POST_TYPE_POST.getDesc())
+                .stream()
+                .sorted((p1, p2) -> p2.getPostDate().compareTo(p1.getPostDate()))
+                .map(e -> new HashMap<String, Object>() {{
+                    put("content", e.getPostContent().replaceAll("<img src=\"", "<img src=\"http://te.jinzantech.com:8181"));
+                    put("postDate", e.getPostDate());
+                    put("title", e.getPostTitle());
+                    put("postThumbnail", e.getPostThumbnail());
+                    put("tags", e.getTags());
+                    put("postUpdate", e.getPostUpdate());
+                    put("postType", e.getPostType());
+                }})
+                .collect(Collectors.toList());
     }
 }
