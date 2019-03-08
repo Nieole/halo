@@ -218,7 +218,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
 
             //压缩图片
             fileInputStream.reset();
-            Thumbnails.of(fileInputStream).width(256).keepAspectRatio(true).outputFormat(fileSuffix).toFile(fullSmallPath.toString());
+            Thumbnails.of(fileInputStream).size(256, 256).keepAspectRatio(false).outputFormat(fileSuffix).toFile(fullSmallPath.toString());
 
             StrBuilder nowYearMonth = new StrBuilder().append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
 
