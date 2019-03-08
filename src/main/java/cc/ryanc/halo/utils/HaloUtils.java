@@ -133,6 +133,16 @@ public class HaloUtils {
         }
     }
 
+    public static String getImageWh(InputStream inputStream){
+        try {
+            final BufferedImage image = ImageIO.read(inputStream);
+            return image.getWidth() + "x" + image.getHeight();
+        }catch (Exception e){
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     /**
      * 获取所有主题
      *

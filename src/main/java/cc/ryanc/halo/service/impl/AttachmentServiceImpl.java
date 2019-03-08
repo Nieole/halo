@@ -38,6 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -162,7 +164,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
     public Map<String, String> attachUpload(MultipartFile file, HttpServletRequest request) {
         final Map<String, String> resultMap = new HashMap<>(6);
         final String dateString = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
-        try {
+        try (InputStream fileInputStream = file.getInputStream()) {
+            fileInputStream.mark(Integer.MAX_VALUE);
             //用户目录
             final StrBuilder uploadPath = new StrBuilder(System.getProperties().getProperty("user.home"));
             uploadPath.append("/halo/");
@@ -179,24 +182,31 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
             }
 
             //不带后缀
-            final StrBuilder nameWithOutSuffix = new StrBuilder(file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", ""));
+//            final StrBuilder nameWithOutSuffix = new StrBuilder(file.getOriginalFilename().substring(0, Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf('.')).replaceAll(" ", "_").replaceAll(",", ""));
+            final StrBuilder nameWithOutSuffix = new StrBuilder(new Random().nextInt(1000));
             nameWithOutSuffix.append(dateString);
             nameWithOutSuffix.append(new Random().nextInt(1000));
 
             //文件后缀
-            final String fileSuffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf('.') + 1);
+            final String fileSuffix = file.getOriginalFilename().substring(Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf('.') + 1);
 
             //带后缀
             final StrBuilder fileName = new StrBuilder(nameWithOutSuffix);
             fileName.append(".");
             fileName.append(fileSuffix);
 
-            file.transferTo(new File(mediaPath.getAbsoluteFile(), fileName.toString()));
-
             //文件原路径
             final StrBuilder fullPath = new StrBuilder(mediaPath.getAbsolutePath());
             fullPath.append("/");
             fullPath.append(fileName);
+
+            //压缩原始图片
+            Thumbnails.of(fileInputStream).width(480).keepAspectRatio(true).outputFormat("jpg").toFile(fullPath.toString());
+            String size = HaloUtils.parseSize(Files.size(Paths.get(fullPath.toString())));
+            String wh;
+            try (InputStream in = Files.newInputStream(Paths.get(fullPath.toString()))) {
+                wh = HaloUtils.getImageWh(in);
+            }
 
             //压缩文件路径
             final StrBuilder fullSmallPath = new StrBuilder(mediaPath.getAbsolutePath());
@@ -206,28 +216,22 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
             fullSmallPath.append(fileSuffix);
 
             //压缩图片
-            Thumbnails.of(fullPath.toString()).size(256, 256).keepAspectRatio(false).toFile(fullSmallPath.toString());
+            fileInputStream.reset();
+            Thumbnails.of(fileInputStream).width(256).keepAspectRatio(true).toFile(fullSmallPath.toString());
+
+            StrBuilder nowYearMonth = new StrBuilder().append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
 
             //映射路径
             final StrBuilder filePath = new StrBuilder("/upload/");
-            filePath.append(DateUtil.thisYear());
-            filePath.append("/");
-            filePath.append(DateUtil.thisMonth());
-            filePath.append("/");
+            filePath.append(nowYearMonth);
             filePath.append(fileName);
 
             //缩略图映射路径
             final StrBuilder fileSmallPath = new StrBuilder("/upload/");
-            fileSmallPath.append(DateUtil.thisYear());
-            fileSmallPath.append("/");
-            fileSmallPath.append(DateUtil.thisMonth());
-            fileSmallPath.append("/");
+            fileSmallPath.append(nowYearMonth);
             fileSmallPath.append(nameWithOutSuffix);
             fileSmallPath.append("_small.");
             fileSmallPath.append(fileSuffix);
-
-            final String size = HaloUtils.parseSize(new File(fullPath.toString()).length());
-            final String wh = HaloUtils.getImageWh(new File(fullPath.toString()));
 
             resultMap.put("fileName", fileName.toString());
             resultMap.put("filePath", filePath.toString());
