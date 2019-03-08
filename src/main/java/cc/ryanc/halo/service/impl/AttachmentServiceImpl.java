@@ -188,7 +188,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
             nameWithOutSuffix.append(new Random().nextInt(1000));
 
             //文件后缀
-            final String fileSuffix = file.getOriginalFilename().substring(Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf('.') + 1);
+//            final String fileSuffix = file.getOriginalFilename().substring(Objects.requireNonNull(file.getOriginalFilename()).lastIndexOf('.') + 1);
+            final String fileSuffix = "jpg";
 
             //带后缀
             final StrBuilder fileName = new StrBuilder(nameWithOutSuffix);
@@ -201,7 +202,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
             fullPath.append(fileName);
 
             //压缩原始图片
-            Thumbnails.of(fileInputStream).width(480).keepAspectRatio(true).outputFormat("jpg").toFile(fullPath.toString());
+            Thumbnails.of(fileInputStream).width(480).keepAspectRatio(true).outputFormat(fileSuffix).toFile(fullPath.toString());
             String size = HaloUtils.parseSize(Files.size(Paths.get(fullPath.toString())));
             String wh;
             try (InputStream in = Files.newInputStream(Paths.get(fullPath.toString()))) {
@@ -217,7 +218,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Long>
 
             //压缩图片
             fileInputStream.reset();
-            Thumbnails.of(fileInputStream).width(256).keepAspectRatio(true).toFile(fullSmallPath.toString());
+            Thumbnails.of(fileInputStream).width(256).keepAspectRatio(true).outputFormat(fileSuffix).toFile(fullSmallPath.toString());
 
             StrBuilder nowYearMonth = new StrBuilder().append(DateUtil.thisYear()).append("/").append(DateUtil.thisMonth()).append("/");
 
